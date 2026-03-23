@@ -1471,3 +1471,10 @@ section { padding: 120px 0; }
   /* Creators */
   .creators-grid { max-width: 100%; }
 }
+
+.logo-img {
+  height: 38px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
