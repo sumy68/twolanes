@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Influencer anmelden – TwoLanes</title>
+  <meta name="description" content="Melde dich als Micro-Influencer an und werde Teil unseres Netzwerks. Wir verbinden dich mit starken Marken in deiner Nische.">
+  <meta name="theme-color" content="#09090E">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Page-specific tweaks */
+    .anmelden-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 64px;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    .step-num {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 17px;
+      color: var(--muted);
+      transition: var(--transition);
+    }
+
+    .step.active .step-num {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #09090E;
+    }
+
+    .step-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 1px;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    .step.active .step-label { color: var(--text); }
+
+    .step-line {
+      width: 80px;
+      height: 1px;
+      background: var(--border);
+      margin: 0 12px;
+      margin-bottom: 22px;
+      flex-shrink: 0;
+    }
+
+    .form-block { margin-bottom: 32px; }
+
+    /* ===== Trust mini-bar ===== */
+    .trust-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 36px;
+      flex-wrap: wrap;
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 64px;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .trust-item span:first-child {
+      font-size: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .step-line { width: 40px; }
+      .anmelden-steps { gap: 0; }
+      .trust-bar { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER (injected) -->
+  <div id="header-placeholder"></div>
+
+  <main>
+
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+      <div class="container">
+
+        <span class="section-tag" style="margin-bottom: 20px; display: inline-block;">Influencer Anmeldung</span>
+        <h1>WERDE TEIL<br><span class="accent-text">DES NETZWERKS.</span></h1>
+        <p>Füll das Formular aus und wir melden uns innerhalb von 48 Stunden bei dir. Kostenlos. Kein Risiko.</p>
+
+      </div>
+    </section>
+
+    <!-- FORM SECTION -->
+    <section class="form-section">
+      <div class="container">
+
+        <!-- Trust mini-bar -->
+        <div class="trust-bar">
+          <div class="trust-item">
+            <span>✅</span>
+            <span>Kostenlose Anmeldung</span>
+          </div>
+          <div class="trust-item">
+            <span>🔒</span>
+            <span>DSGVO-konform</span>
+          </div>
+          <div class="trust-item">
+            <span>⚡</span>
+            <span>Antwort in 48h</span>
+          </div>
+          <div class="trust-item">
+            <span>🤝</span>
+            <span>Persönliche Betreuung</span>
+          </div>
+          <div class="trust-item">
+            <span>🎯</span>
+            <span>Geprüfte Markenpartner</span>
+          </div>
+        </div>
+
+        <!-- Process Steps -->
+        <div class="anmelden-steps">
+          <div class="step active">
+            <div class="step-num">1</div>
+            <span class="step-label">Anmelden</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <span class="step-label">Prüfung</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <span class="step-label">Matching</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <span class="step-label">Kooperation</span>
+          </div>
+        </div>
+
+        <div class="form-wrap">
+          <div class="form-card">
+
+            <!-- FORM -->
+            <form id="anmeldeForm" novalidate>
+
+              <!-- Persönliche Daten -->
+              <div class="form-block">
+                <div class="form-section-title">PERSÖNLICHE DATEN</div>
+
+                <div class="form-group-row">
+                  <div class="form-group">
+                    <label for="vorname">Vorname *</label>
+                    <input type="text" id="vorname" name="vorname" placeholder="Max" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="nachname">Nachname *</label>
+                    <input type="text" id="nachname" name="nachname" placeholder="Mustermann" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="email">E-Mail Adresse *</label>
+                  <input type="email" id="email" name="email" placeholder="max@beispiel.de" required>
+                </div>
+
+              </div>
+
+              <div class="form-divider"></div>
+
+              <!-- Social Media -->
+              <div class="form-block">
+                <div class="form-section-title">SOCIAL MEDIA PROFILE</div>
+
+                <div class="form-group-row">
+                  <div class="form-group">
+                    <label for="instagram">Instagram Handle *</label>
+                    <input type="text" id="instagram" name="instagram" placeholder="@deinprofil" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="tiktok">TikTok Handle <span class="optional">(optional)</span></label>
+                    <input type="text" id="tiktok" name="tiktok" placeholder="@deinprofil">
+                  </div>
+                </div>
+
+                <div class="form-group-row">
+                  <div class="form-group">
+                    <label for="follower">Followerzahl (Instagram) *</label>
+                    <select id="follower" name="follower" required>
+                      <option value="" disabled selected>Bitte wählen…</option>
+                      <option value="1k-5k">1.000 – 5.000</option>
+                      <option value="5k-10k">5.000 – 10.000</option>
+                      <option value="10k-25k">10.000 – 25.000</option>
+                      <option value="25k-50k">25.000 – 50.000</option>
+                      <option value="50k-100k">50.000 – 100.000</option>
+                      <option value="100k+">100.000+</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="nische">Deine Nische *</label>
+                    <select id="nische" name="nische" required>
+                      <option value="" disabled selected>Bitte wählen…</option>
+                      <option value="beauty">💄 Beauty</option>
+                      <option value="food">🍜 Food</option>
+                      <option value="travel">✈️ Travel</option>
+                      <option value="fitness">💪 Fitness</option>
+                      <option value="lifestyle">🌿 Lifestyle</option>
+                      <option value="gaming">🎮 Gaming</option>
+                      <option value="fashion">👗 Fashion</option>
+                      <option value="tech">📱 Tech</option>
+                      <option value="family">👶 Family</option>
+                      <option value="business">💼 Business</option>
+                      <option value="other">✨ Sonstiges</option>
+                    </select>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="form-divider"></div>
+
+              <!-- Über dich -->
+              <div class="form-block">
+                <div class="form-section-title">ÜBER DICH</div>
+
+                <div class="form-group">
+                  <label for="bio">Kurze Bio – wer bist du? *</label>
+                  <textarea id="bio" name="bio" placeholder="Erzähl uns kurz, wer du bist, was du machst und was deine Community ausmacht…" required></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="beitrag">Link zu einem deiner Beiträge <span class="optional">(optional)</span></label>
+                  <input type="url" id="beitrag" name="beitrag" placeholder="https://www.instagram.com/p/…">
+                </div>
+
+              </div>
+
+              <div class="form-divider"></div>
+
+              <!-- DSGVO Checkbox -->
+              <div class="checkbox-row">
+                <input type="checkbox" id="dsgvo" name="dsgvo" required>
+                <label for="dsgvo">
+                  Ich stimme zu, dass meine Daten zur Bearbeitung meiner Anfrage gespeichert und verarbeitet werden. Weitere Infos in unserer <a href="#">Datenschutzerklärung</a>. Ich kann meine Einwilligung jederzeit widerrufen. *
+                </label>
+              </div>
+
+              <!-- Submit -->
+              <div class="form-submit">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  Anmeldung absenden ↗
+                </button>
+                <p class="form-note">* Pflichtfelder · Kostenlos · Keine Verpflichtung</p>
+              </div>
+
+            </form>
+
+            <!-- SUCCESS STATE -->
+            <div class="form-success" id="formSuccess">
+              <div class="success-icon">🎉</div>
+              <h3>ANMELDUNG ERHALTEN!</h3>
+              <p>
+                Danke für deine Anmeldung! Wir prüfen dein Profil und melden uns<br>
+                innerhalb von <strong>48 Stunden</strong> persönlich bei dir.
+              </p>
+            </div>
+
+          </div><!-- /.form-card -->
+        </div><!-- /.form-wrap -->
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER (injected) -->
+  <div id="footer-placeholder"></div>
+
+  <script src="main.js"></script>
+</body>
+</html>

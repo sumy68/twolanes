@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TwoLanes — Creator Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --white: #ffffff;
+  --off: #f7f7f7;
+  --light: #efefef;
+  --border: #e0e0e0;
+  --gray: #999;
+  --dark-gray: #444;
+  --black: #0a0a0a;
+  --accent: #0a0a0a;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  overflow-x: hidden;
+}
+
+/* ── CURSOR ── */
+.cursor { width: 8px; height: 8px; background: var(--black); border-radius: 50%; position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; transition: transform 0.1s; }
+.cursor-ring { width: 32px; height: 32px; border: 1px solid var(--black); border-radius: 50%; position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9998; opacity: 0.3; transition: width 0.2s, height 0.2s, opacity 0.2s; }
+body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring { width: 48px; height: 48px; opacity: 0.15; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 28px 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: all 0.4s ease;
+}
+nav.scrolled {
+  padding: 18px 64px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none;
+}
+.nav-logo-slashes {
+  display: flex; gap: 4px; align-items: center;
+}
+.nav-logo-slash {
+  width: 2px; height: 22px; background: var(--black);
+  transform: rotate(15deg);
+}
+.nav-logo-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--black); letter-spacing: 0;
+}
+.nav-logo-sub {
+  font-size: 9px; font-weight: 500; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gray);
+  align-self: flex-end; padding-bottom: 1px;
+}
+.nav-links { display: flex; gap: 36px; list-style: none; align-items: center; }
+.nav-links a {
+  font-size: 12px; font-weight: 500; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--dark-gray);
+  text-decoration: none; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--black); }
+.nav-right { display: flex; gap: 12px; align-items: center; }
+.lang-btn {
+  background: none; border: 1px solid var(--border);
+  font-size: 11px; font-weight: 600; letter-spacing: 1px;
+  padding: 5px 10px; cursor: pointer; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif; color: var(--gray);
+}
+.lang-btn.active, .lang-btn:hover { border-color: var(--black); color: var(--black); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  padding: 160px 64px 100px;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.hero-slash-bg {
+  position: absolute; right: -80px; top: 50%;
+  transform: translateY(-50%);
+  display: flex; gap: 28px;
+  opacity: 0.04; pointer-events: none;
+}
+.hero-slash-bg-line {
+  width: 6px; height: 600px; background: var(--black);
+  transform: rotate(15deg);
+}
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 36px;
+  opacity: 0; animation: fadeUp 0.7s ease 0.1s forwards;
+}
+.hero-eyebrow-slashes { display: flex; gap: 3px; }
+.hero-eyebrow-slash { width: 2px; height: 14px; background: var(--black); transform: rotate(15deg); }
+.hero-eyebrow span {
+  font-size: 11px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gray);
+}
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(56px, 9vw, 120px);
+  font-weight: 800; line-height: 0.92;
+  color: var(--black); letter-spacing: -2px;
+  margin-bottom: 40px;
+  opacity: 0; animation: fadeUp 0.7s ease 0.25s forwards;
+}
+.hero-title .italic {
+  font-style: italic; font-weight: 400;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85em; letter-spacing: -1px;
+}
+.hero-title .outline {
+  -webkit-text-stroke: 2px var(--black);
+  color: transparent;
+}
+.hero-bottom {
+  display: flex; align-items: flex-end;
+  justify-content: space-between; gap: 48px;
+  opacity: 0; animation: fadeUp 0.7s ease 0.4s forwards;
+}
+.hero-desc {
+  font-size: 16px; font-weight: 300;
+  color: var(--dark-gray); line-height: 1.7;
+  max-width: 440px;
+}
+.hero-desc strong { font-weight: 500; color: var(--black); }
+.hero-actions { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; flex-shrink: 0; }
+.btn-black {
+  background: var(--black); color: var(--white);
+  font-size: 12px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; padding: 16px 40px;
+  text-decoration: none; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif; display: inline-block;
+}
+.btn-black:hover { background: #222; transform: translateY(-1px); }
+.btn-outline {
+  border: 1px solid var(--border); color: var(--dark-gray);
+  font-size: 12px; font-weight: 500; letter-spacing: 2px;
+  text-transform: uppercase; padding: 16px 40px;
+  text-decoration: none; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif; display: inline-block;
+}
+.btn-outline:hover { border-color: var(--black); color: var(--black); }
+
+/* Stats bar */
+.hero-stats-bar {
+  display: flex; border-top: 1px solid var(--border);
+  margin-top: 80px;
+  opacity: 0; animation: fadeUp 0.7s ease 0.55s forwards;
+}
+.hero-stat {
+  flex: 1; padding: 32px 0;
+  border-right: 1px solid var(--border);
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 42px; font-weight: 800;
+  color: var(--black); line-height: 1; margin-bottom: 6px;
+}
+.hero-stat-label {
+  font-size: 11px; font-weight: 500; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--gray);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MARQUEE ── */
+.marquee-bar {
+  background: var(--black); padding: 16px 0;
+  overflow: hidden;
+}
+.marquee-track {
+  display: flex; animation: marquee 25s linear infinite;
+  white-space: nowrap;
+}
+.marquee-item {
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 32px; flex-shrink: 0;
+  font-size: 11px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(255,255,255,0.4);
+}
+.marquee-sep { color: rgba(255,255,255,0.15); }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ── SECTION BASE ── */
+section { padding: 120px 64px; position: relative; }
+.section-header { margin-bottom: 72px; }
+.section-eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.section-eyebrow-slashes { display: flex; gap: 3px; }
+.section-eyebrow-slash { width: 1.5px; height: 12px; background: var(--black); transform: rotate(15deg); }
+.section-eyebrow span {
+  font-size: 10px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gray);
+}
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 800; line-height: 1.0;
+  color: var(--black); letter-spacing: -1px;
+}
+.section-title .italic {
+  font-style: italic; font-weight: 300;
+  font-family: 'DM Sans', sans-serif; letter-spacing: 0;
+}
+.section-title .outline {
+  -webkit-text-stroke: 1.5px var(--black); color: transparent;
+}
+
+/* ── ABOUT ── */
+.about { background: var(--off); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+.about-text p {
+  font-size: 17px; font-weight: 300; line-height: 1.8;
+  color: var(--dark-gray); margin-bottom: 24px;
+}
+.about-text p strong { font-weight: 600; color: var(--black); }
+.about-text p:last-child { margin-bottom: 0; }
+.about-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+.about-card {
+  background: var(--white); padding: 36px 28px;
+  transition: background 0.25s;
+}
+.about-card:hover { background: var(--black); }
+.about-card:hover .about-card-num { color: var(--white); }
+.about-card:hover .about-card-label { color: rgba(255,255,255,0.5); }
+.about-card:hover .about-card-slashes .about-card-slash { background: var(--white); }
+.about-card-slashes { display: flex; gap: 3px; margin-bottom: 16px; }
+.about-card-slash { width: 2px; height: 18px; background: var(--black); transform: rotate(15deg); transition: background 0.25s; }
+.about-card-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 40px; font-weight: 800;
+  color: var(--black); line-height: 1; margin-bottom: 6px;
+  transition: color 0.25s;
+}
+.about-card-label {
+  font-size: 11px; font-weight: 500; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--gray);
+  transition: color 0.25s;
+}
+
+/* ── CREATORS ── */
+.creators { background: var(--white); }
+.creators-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+.creator-card {
+  background: var(--white); overflow: hidden;
+  transition: all 0.3s; position: relative;
+  display: flex; flex-direction: column;
+}
+.creator-card:hover { background: var(--off); }
+.creator-card-img-wrap {
+  width: 100%; aspect-ratio: 4/5; overflow: hidden;
+  background: var(--light); position: relative;
+}
+.creator-card-img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(100%); transition: filter 0.4s, transform 0.5s;
+  display: block;
+}
+.creator-card:hover .creator-card-img { filter: grayscale(0%); transform: scale(1.03); }
+.creator-placeholder {
+  width: 100%; aspect-ratio: 4/5;
+  background: var(--light);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+}
+.creator-placeholder-icon {
+  width: 56px; height: 56px; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: var(--gray);
+}
+.creator-placeholder-text {
+  font-size: 10px; font-weight: 500; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gray);
+}
+.creator-badge {
+  position: absolute; top: 16px; left: 16px;
+  background: var(--black); color: var(--white);
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; padding: 5px 10px;
+}
+.creator-body { padding: 28px 24px 32px; flex: 1; display: flex; flex-direction: column; }
+.creator-niche {
+  font-size: 10px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gray); margin-bottom: 8px;
+}
+.creator-name {
+  font-family: 'Syne', sans-serif; font-size: 26px;
+  font-weight: 800; color: var(--black); margin-bottom: 3px;
+  letter-spacing: -0.5px;
+}
+.creator-handle { font-size: 12px; color: var(--gray); margin-bottom: 24px; }
+.creator-stats {
+  display: flex; gap: 0; margin-top: auto;
+  border-top: 1px solid var(--border); padding-top: 20px;
+}
+.creator-stat { flex: 1; }
+.creator-stat-val {
+  font-family: 'Syne', sans-serif; font-size: 20px;
+  font-weight: 700; color: var(--black); line-height: 1;
+}
+.creator-stat-label {
+  font-size: 10px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--gray); margin-top: 3px;
+}
+
+/* ── NUMBERS ── */
+.numbers-bar {
+  background: var(--black); padding: 0 64px;
+  border-top: 1px solid #1a1a1a;
+}
+.numbers-inner { display: flex; border-left: 1px solid #1e1e1e; }
+.number-item {
+  flex: 1; padding: 56px 40px;
+  border-right: 1px solid #1e1e1e;
+}
+.number-val {
+  font-family: 'Syne', sans-serif; font-size: 56px;
+  font-weight: 800; color: var(--white); line-height: 1;
+  margin-bottom: 8px;
+}
+.number-label {
+  font-size: 11px; font-weight: 500; letter-spacing: 2.5px;
+  text-transform: uppercase; color: rgba(255,255,255,0.35);
+}
+
+/* ── SERVICES ── */
+.services { background: var(--off); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.services-tabs {
+  display: flex; gap: 0; margin-bottom: 0;
+  border-bottom: 1px solid var(--border);
+}
+.services-tab {
+  padding: 14px 28px; font-size: 12px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--gray);
+  background: none; border: none; border-bottom: 2px solid transparent;
+  cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  margin-bottom: -1px;
+}
+.services-tab.active { color: var(--black); border-bottom-color: var(--black); }
+.services-content { display: none; padding-top: 56px; }
+.services-content.active { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+.service-card {
+  background: var(--white); padding: 40px 32px;
+  transition: background 0.25s; cursor: default;
+}
+.service-card:hover { background: var(--black); }
+.service-card:hover .service-slashes .service-slash { background: rgba(255,255,255,0.5); }
+.service-card:hover .service-title { color: var(--white); }
+.service-card:hover .service-desc { color: rgba(255,255,255,0.5); }
+.service-slashes { display: flex; gap: 3px; margin-bottom: 24px; }
+.service-slash { width: 2px; height: 20px; background: var(--black); transform: rotate(15deg); transition: background 0.25s; }
+.service-title {
+  font-family: 'Syne', sans-serif; font-size: 20px;
+  font-weight: 700; color: var(--black); margin-bottom: 12px;
+  transition: color 0.25s;
+}
+.service-desc {
+  font-size: 13px; font-weight: 300; color: var(--dark-gray);
+  line-height: 1.7; transition: color 0.25s;
+}
+
+/* ── CONTACT ── */
+.contact { background: var(--white); }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-top: 72px; }
+.contact-left p {
+  font-size: 16px; font-weight: 300; color: var(--dark-gray);
+  line-height: 1.7; margin-bottom: 48px; max-width: 400px;
+}
+.contact-item {
+  display: flex; gap: 20px; align-items: flex-start;
+  padding: 20px 0; border-bottom: 1px solid var(--border);
+}
+.contact-item:first-of-type { border-top: 1px solid var(--border); }
+.contact-item-icon {
+  width: 40px; height: 40px; background: var(--black);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0; color: var(--white);
+}
+.contact-item-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--gray); margin-bottom: 4px;
+}
+.contact-item-val { font-size: 14px; font-weight: 500; color: var(--black); }
+.contact-item-val a { color: var(--black); text-decoration: none; transition: opacity 0.2s; }
+.contact-item-val a:hover { opacity: 0.6; }
+.contact-right {
+  background: var(--black); padding: 56px;
+  position: sticky; top: 100px;
+}
+.contact-right-slashes { display: flex; gap: 4px; margin-bottom: 28px; }
+.contact-right-slash { width: 3px; height: 28px; background: rgba(255,255,255,0.3); transform: rotate(15deg); }
+.contact-right h3 {
+  font-family: 'Syne', sans-serif; font-size: 32px;
+  font-weight: 800; color: var(--white); margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+.contact-right p {
+  font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.5);
+  line-height: 1.7; margin-bottom: 36px;
+}
+.btn-white {
+  display: block; background: var(--white); color: var(--black);
+  font-size: 12px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; padding: 16px 32px; text-decoration: none;
+  text-align: center; transition: opacity 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-white:hover { opacity: 0.85; }
+.contact-note {
+  margin-top: 16px; font-size: 11px; color: rgba(255,255,255,0.3);
+  text-align: center; letter-spacing: 0.5px;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--black);
+  border-top: 1px solid #1a1a1a;
+  padding: 40px 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 20px;
+}
+.footer-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.footer-slash { width: 2px; height: 18px; background: rgba(255,255,255,0.4); transform: rotate(15deg); }
+.footer-logo-text {
+  font-family: 'Syne', sans-serif; font-size: 16px;
+  font-weight: 700; color: var(--white); letter-spacing: 0;
+}
+.footer-copy { font-size: 11px; color: rgba(255,255,255,0.3); }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a {
+  font-size: 11px; color: rgba(255,255,255,0.3);
+  text-decoration: none; letter-spacing: 0.5px; transition: color 0.2s;
+}
+.footer-links a:hover { color: rgba(255,255,255,0.7); }
+
+/* ── REVEAL ── */
+.reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+.reveal-d4 { transition-delay: 0.4s; }
+
+/* ── MOBILE ── */
+@media (max-width: 900px) {
+  nav, nav.scrolled { padding: 18px 24px; }
+  .nav-links, .nav-logo-sub { display: none; }
+  section { padding: 80px 24px; }
+  .hero { padding: 130px 24px 80px; }
+  .hero-bottom { flex-direction: column; align-items: flex-start; gap: 32px; }
+  .hero-actions { align-items: flex-start; }
+  .hero-stats-bar { flex-wrap: wrap; }
+  .hero-stat { min-width: 50%; border-bottom: 1px solid var(--border); }
+  .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+  .about-cards { grid-template-columns: 1fr 1fr; }
+  .creators-grid, .services-content.active { grid-template-columns: 1fr; }
+  .numbers-bar { padding: 0 24px; }
+  .numbers-inner { flex-wrap: wrap; }
+  .number-item { min-width: 50%; }
+  .contact-right { padding: 36px 28px; position: static; }
+  footer { flex-direction: column; align-items: flex-start; padding: 32px 24px; }
+  .hero-slash-bg { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-slashes">
+      <div class="nav-logo-slash"></div>
+      <div class="nav-logo-slash"></div>
+    </div>
+    <div class="nav-logo-text">TwoLanes</div>
+    <div class="nav-logo-sub">Creator Management</div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about" data-de="Über uns" data-en="About">Über uns</a></li>
+    <li><a href="#creators" data-de="Creator" data-en="Creators">Creator</a></li>
+    <li><a href="#services" data-de="Services" data-en="Services">Services</a></li>
+    <li><a href="#contact" data-de="Kontakt" data-en="Contact">Kontakt</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="lang-btn active" onclick="setLang('de',this)">DE</button>
+    <button class="lang-btn" onclick="setLang('en',this)">EN</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-slash-bg">
+    <div class="hero-slash-bg-line"></div>
+    <div class="hero-slash-bg-line"></div>
+    <div class="hero-slash-bg-line"></div>
+    <div class="hero-slash-bg-line"></div>
+    <div class="hero-slash-bg-line"></div>
+  </div>
+
+  <div class="hero-eyebrow">
+    <div class="hero-eyebrow-slashes">
+      <div class="hero-eyebrow-slash"></div>
+      <div class="hero-eyebrow-slash"></div>
+    </div>
+    <span data-de="Creator Management Agentur — Deutschland" data-en="Creator Management Agency — Germany">Creator Management Agentur — Deutschland</span>
+  </div>
+
+  <h1 class="hero-title">
+    <span data-de="Wir" data-en="We">Wir</span> <span class="italic" data-de="bauen" data-en="build">bauen</span><br>
+    <span data-de="Reichweite." data-en="Reach.">Reichweite.</span><br>
+    <span class="outline" data-de="Wir schließen" data-en="We close">Wir schließen</span><br>
+    <span class="outline" data-de="Deals." data-en="Deals.">Deals.</span>
+  </h1>
+
+  <div class="hero-bottom">
+    <p class="hero-desc" data-de="TwoLanes verbindet <strong>Brands mit Creatorn</strong> — strategisch, professionell und mit messbaren Ergebnissen. Creator machen Content. Wir machen den Rest." data-en="TwoLanes connects <strong>brands with creators</strong> — strategically, professionally and with measurable results. Creators make content. We do the rest.">
+      TwoLanes verbindet <strong>Brands mit Creatorn</strong> — strategisch, professionell und mit messbaren Ergebnissen. Creator machen Content. Wir machen den Rest.
+    </p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-black" data-de="Jetzt anfragen" data-en="Get in touch">Jetzt anfragen</a>
+      <a href="#creators" class="btn-outline" data-de="Unsere Creator" data-en="Our Creators">Unsere Creator</a>
+    </div>
+  </div>
+
+  <div class="hero-stats-bar">
+    <div class="hero-stat">
+      <div class="hero-stat-val">4.3M+</div>
+      <div class="hero-stat-label" data-de="Views / Monat" data-en="Views / Month">Views / Monat</div>
+    </div>
+    <div class="hero-stat" style="padding-left:40px;">
+      <div class="hero-stat-val">50K+</div>
+      <div class="hero-stat-label" data-de="Follower gesamt" data-en="Total Followers">Follower gesamt</div>
+    </div>
+    <div class="hero-stat" style="padding-left:40px;">
+      <div class="hero-stat-val">2</div>
+      <div class="hero-stat-label" data-de="Aktive Creator" data-en="Active Creators">Aktive Creator</div>
+    </div>
+    <div class="hero-stat" style="padding-left:40px;">
+      <div class="hero-stat-val">100%</div>
+      <div class="hero-stat-label" data-de="Organisch" data-en="Organic">Organisch</div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-bar">
+  <div class="marquee-track">
+    <div class="marquee-item"><span>TikTok Management</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Brand Deals</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Instagram Reels</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Content Strategie</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Wachstum</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Kooperationen</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Media Kit</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Creator Economy</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>TikTok Management</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Brand Deals</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Instagram Reels</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Content Strategie</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Wachstum</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Kooperationen</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Media Kit</span><span class="marquee-sep">//</span></div>
+    <div class="marquee-item"><span>Creator Economy</span><span class="marquee-sep">//</span></div>
+  </div>
+</div>
+
+
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="section-header">
+    <div class="section-eyebrow reveal">
+      <div class="section-eyebrow-slashes">
+        <div class="section-eyebrow-slash"></div>
+        <div class="section-eyebrow-slash"></div>
+      </div>
+      <span data-de="Über TwoLanes" data-en="About TwoLanes">Über TwoLanes</span>
+    </div>
+    <h2 class="section-title reveal reveal-d1">
+      <span data-de="Nicht jede" data-en="Not every">Nicht jede</span><br>
+      <span class="italic" data-de="Agentur ist" data-en="agency is">Agentur ist</span><br>
+      <span class="outline" data-de="gleich." data-en="the same.">gleich.</span>
+    </h2>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-text reveal reveal-d2">
+      <p data-de="TwoLanes ist eine Creator Management Agentur aus Deutschland — gegründet von zwei Studenten, die verstehen wie Creator Economy <strong>wirklich funktioniert</strong>." data-en="TwoLanes is a creator management agency from Germany — founded by two students who understand how creator economy <strong>really works</strong>.">
+        TwoLanes ist eine Creator Management Agentur aus Deutschland — gegründet von zwei Studenten, die verstehen wie Creator Economy <strong>wirklich funktioniert</strong>.
+      </p>
+      <p data-de="Wir managen keine Zahlen. Wir bauen Karrieren. Creator machen Content — wir übernehmen Brand-Akquise, Verhandlung, Strategie und alles dazwischen. <strong>100% Fokus auf Wachstum.</strong>" data-en="We don't manage numbers. We build careers. Creators make content — we handle brand acquisition, negotiation, strategy and everything in between. <strong>100% focus on growth.</strong>">
+        Wir managen keine Zahlen. Wir bauen Karrieren. Creator machen Content — wir übernehmen Brand-Akquise, Verhandlung, Strategie und alles dazwischen. <strong>100% Fokus auf Wachstum.</strong>
+      </p>
+    </div>
+    <div class="about-cards reveal reveal-d3">
+      <div class="about-card">
+        <div class="about-card-slashes"><div class="about-card-slash"></div><div class="about-card-slash"></div></div>
+        <div class="about-card-num">01</div>
+        <div class="about-card-label" data-de="Brand Deals sichern" data-en="Secure Brand Deals">Brand Deals sichern</div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-slashes"><div class="about-card-slash"></div><div class="about-card-slash"></div></div>
+        <div class="about-card-num">02</div>
+        <div class="about-card-label" data-de="Reichweite steigern" data-en="Grow Reach">Reichweite steigern</div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-slashes"><div class="about-card-slash"></div><div class="about-card-slash"></div></div>
+        <div class="about-card-num">03</div>
+        <div class="about-card-label" data-de="Strategie entwickeln" data-en="Develop Strategy">Strategie entwickeln</div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-slashes"><div class="about-card-slash"></div><div class="about-card-slash"></div></div>
+        <div class="about-card-num">04</div>
+        <div class="about-card-label" data-de="Langfristig wachsen" data-en="Grow Long-term">Langfristig wachsen</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CREATORS -->
+<section class="creators" id="creators">
+  <div class="section-header">
+    <div class="section-eyebrow reveal">
+      <div class="section-eyebrow-slashes">
+        <div class="section-eyebrow-slash"></div>
+        <div class="section-eyebrow-slash"></div>
+      </div>
+      <span data-de="Unser Roster" data-en="Our Roster">Unser Roster</span>
+    </div>
+    <h2 class="section-title reveal reveal-d1">
+      <span data-de="Unsere" data-en="Our">Unsere</span><br>
+      <span class="italic" data-de="Creator." data-en="Creators.">Creator.</span>
+    </h2>
+  </div>
+
+  <div class="creators-grid">
+    <!-- Mahdi -->
+    <div class="creator-card reveal reveal-d1">
+      <div class="creator-card-img-wrap">
+        <div class="creator-badge">Active</div>
+        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80"
+             alt="Mahdi" class="creator-card-img"
+             onerror="this.parentElement.innerHTML='<div class=\'creator-placeholder\'><div class=\'creator-placeholder-icon\'>💪</div><span class=\'creator-placeholder-text\'>Mahdi</span></div>'">
+      </div>
+      <div class="creator-body">
+        <div class="creator-niche" data-de="Gym // Fitness // Lifestyle" data-en="Gym // Fitness // Lifestyle">Gym // Fitness // Lifestyle</div>
+        <div class="creator-name">Mahdi</div>
+        <div class="creator-handle">@deinkurdischerbaki</div>
+        <div class="creator-stats">
+          <div class="creator-stat">
+            <div class="creator-stat-val">40K</div>
+            <div class="creator-stat-label">TikTok</div>
+          </div>
+          <div class="creator-stat">
+            <div class="creator-stat-val">10.6K</div>
+            <div class="creator-stat-label">Instagram</div>
+          </div>
+          <div class="creator-stat">
+            <div class="creator-stat-val">2.4M</div>
+            <div class="creator-stat-label" data-de="Top Views" data-en="Top Views">Top Views</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Emilia -->
+    <div class="creator-card reveal reveal-d2">
+      <div class="creator-card-img-wrap">
+        <div class="creator-badge">Active</div>
+        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80"
+             alt="Emilia" class="creator-card-img"
+             onerror="this.parentElement.innerHTML='<div class=\'creator-placeholder\'><div class=\'creator-placeholder-icon\'>✨</div><span class=\'creator-placeholder-text\'>Emilia</span></div>'">
+      </div>
+      <div class="creator-body">
+        <div class="creator-niche" data-de="Lifestyle // Tanz // Fashion" data-en="Lifestyle // Dance // Fashion">Lifestyle // Tanz // Fashion</div>
+        <div class="creator-name">Emilia</div>
+        <div class="creator-handle">@emilia</div>
+        <div class="creator-stats">
+          <div class="creator-stat">
+            <div class="creator-stat-val">10.9K</div>
+            <div class="creator-stat-label">TikTok</div>
+          </div>
+          <div class="creator-stat">
+            <div class="creator-stat-val">1.1K</div>
+            <div class="creator-stat-label">Instagram</div>
+          </div>
+          <div class="creator-stat">
+            <div class="creator-stat-val">347K</div>
+            <div class="creator-stat-label" data-de="Top Views" data-en="Top Views">Top Views</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Placeholder -->
+    <div class="creator-card reveal reveal-d3">
+      <div class="creator-placeholder">
+        <div class="creator-placeholder-icon">
+          <div style="display:flex;gap:3px">
+            <div style="width:2px;height:14px;background:#ccc;transform:rotate(15deg)"></div>
+            <div style="width:2px;height:14px;background:#ccc;transform:rotate(15deg)"></div>
+          </div>
+        </div>
+        <span class="creator-placeholder-text" data-de="Coming Soon" data-en="Coming Soon">Coming Soon</span>
+      </div>
+      <div class="creator-body">
+        <div class="creator-niche" data-de="Deine Nische" data-en="Your Niche">Deine Nische</div>
+        <div class="creator-name" data-de="Du?" data-en="You?">Du?</div>
+        <div class="creator-handle" data-de="Wir wachsen" data-en="We're growing">Wir wachsen</div>
+        <div class="creator-stats">
+          <div class="creator-stat"><div class="creator-stat-val">—</div><div class="creator-stat-label">TikTok</div></div>
+          <div class="creator-stat"><div class="creator-stat-val">—</div><div class="creator-stat-label">Instagram</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<div class="numbers-bar reveal">
+  <div class="numbers-inner">
+    <div class="number-item">
+      <div class="number-val">4.3M+</div>
+      <div class="number-label" data-de="Views pro Monat" data-en="Views per Month">Views pro Monat</div>
+    </div>
+    <div class="number-item">
+      <div class="number-val">50K+</div>
+      <div class="number-label" data-de="Follower gesamt" data-en="Total Followers">Follower gesamt</div>
+    </div>
+    <div class="number-item">
+      <div class="number-val">2</div>
+      <div class="number-label" data-de="Aktive Brands" data-en="Active Brands">Aktive Brands</div>
+    </div>
+    <div class="number-item">
+      <div class="number-val">100%</div>
+      <div class="number-label" data-de="Organisch" data-en="Organic">Organisch</div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="section-header">
+    <div class="section-eyebrow reveal">
+      <div class="section-eyebrow-slashes">
+        <div class="section-eyebrow-slash"></div>
+        <div class="section-eyebrow-slash"></div>
+      </div>
+      <span data-de="Was wir bieten" data-en="What we offer">Was wir bieten</span>
+    </div>
+    <h2 class="section-title reveal reveal-d1">
+      <span data-de="Services für" data-en="Services for">Services für</span><br>
+      <span class="italic" data-de="Brands &" data-en="Brands &">Brands &</span><br>
+      <span class="outline" data-de="Creator." data-en="Creators.">Creator.</span>
+    </h2>
+  </div>
+
+  <div class="services-tabs reveal reveal-d2">
+    <button class="services-tab active" onclick="showTab('brands',this)" data-de="Für Brands" data-en="For Brands">Für Brands</button>
+    <button class="services-tab" onclick="showTab('creators',this)" data-de="Für Creator" data-en="For Creators">Für Creator</button>
+  </div>
+
+  <div class="services-content active" id="tab-brands">
+    <div class="service-card reveal reveal-d1">
+      <div class="service-slashes"><div class="service-slash"></div><div class="service-slash"></div></div>
+      <div class="service-title" data-de="Creator Matching" data-en="Creator Matching">Creator Matching</div>
+      <div class="service-desc" data-de="Wir finden den Creator der perfekt zu eurer Brand passt — nach Nische, Zielgruppe, Stil und Budget." data-en="We find the creator that perfectly matches your brand — by niche, audience, style and budget.">Wir finden den Creator der perfekt zu eurer Brand passt — nach Nische, Zielgruppe, Stil und Budget.</div>
+    </div>
+    <div class="service-card reveal reveal-d2">
+      <div class="service-slashes"><div class="service-slash"></div><div class="service-slash"></div></div>
+      <div class="service-title" data-de="Sponsored Content" data-en="Sponsored Content">Sponsored Content</div>
+      <div class="service-desc" data-de="TikTok Videos, Instagram Reels, Stories und mehr — authentisch integriert und auf eure KPIs ausgerichtet." data-en="TikTok videos, Instagram Reels, Stories and more — authentically integrated and aligned with your KPIs.">TikTok Videos, Instagram Reels, Stories und mehr — authentisch integriert und auf eure KPIs ausgerichtet.</div>
+    </div>
+    <div class="service-card reveal reveal-d3">
+      <div class="service-slashes"><div class="service-slash"></div><div class="service-slash"></div></div>
+      <div class="service-title" data-de="Langzeit-Deals" data-en="Long-term Deals">Langzeit-Deals</div>
+      <div class="service-desc" data-de="Nachhaltige Partnerschaften statt einmaliger Posts. Wir koordinieren alles — vom Briefing bis zur Abrechnung." data-en="Sustainable partnerships instead of one-off posts. We coordinate everything — from briefing to billing.">Nachhaltige Partnerschaften statt einmaliger Posts. Wir koordinieren alles — vom Briefing bis zur Abrechnung.</div>
+    </div>
+  </div>
+
+  <div class="services-content" id="tab-creators">
+    <div class="service-card reveal">
+      <div class="service-slashes"><div class="service-slash"></div><div class="service-slash"></div></div>
+      <div class="service-title" data-de="Brand Deals" data-en="Brand Deals">Brand Deals</div>
+      <div class="service-desc" data-de="Wir akquirieren Brands, verhandeln Preise und koordinieren den gesamten Prozess. Du machst Content — wir machen den Rest." data-en="We acquire brands, negotiate rates and coordinate the entire process. You make content — we do the rest.">Wir akquirieren Brands, verhandeln Preise und koordinieren den gesamten Prozess. Du machst Content — wir machen den Rest.</div>
+    </div>
+    <div class="service-card reveal reveal-d1">
+      <div class="service-slashes"><div class="service-slash"></div><div class="service-slash"></div></div>
+      <div class="service-title" data-de="Wachstumsstrategie" data-en="Growth Strategy">Wachstumsstrategie</div>
+      <div class="service-desc" data-de="Content-Kalender, Trending Sounds, Posting-Zeiten — alles datenbasiert und auf deine Nische zugeschnitten." data-en="Content calendar, trending sounds, posting times — all data-driven and tailored to your niche.">Content-Kalender, Trending Sounds, Posting-Zeiten — alles datenbasiert und auf deine Nische zugeschnitten.</div>
+    </div>
+    <div class="service-card reveal reveal-d2">
+      <div class="service-slashes"><div class="service-slash"></div><div class="service-slash"></div></div>
+      <div class="service-title" data-de="Media Kit & Branding" data-en="Media Kit & Branding">Media Kit & Branding</div>
+      <div class="service-desc" data-de="Professionelles Media Kit, optimiertes Profil — alles was Brands sehen müssen um sofort Ja zu sagen." data-en="Professional media kit, optimized profile — everything brands need to see to immediately say yes.">Professionelles Media Kit, optimiertes Profil — alles was Brands sehen müssen um sofort Ja zu sagen.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="section-eyebrow reveal">
+    <div class="section-eyebrow-slashes">
+      <div class="section-eyebrow-slash"></div>
+      <div class="section-eyebrow-slash"></div>
+    </div>
+    <span data-de="Kontakt" data-en="Contact">Kontakt</span>
+  </div>
+  <h2 class="section-title reveal reveal-d1" style="margin-bottom: 0;">
+    <span data-de="Lass uns" data-en="Let's">Lass uns</span><br>
+    <span class="italic" data-de="reden." data-en="talk.">reden.</span>
+  </h2>
+
+  <div class="contact-grid">
+    <div class="contact-left reveal reveal-d2">
+      <p data-de="Ihr seid eine Brand und sucht den richtigen Creator? Oder ihr seid ein Creator und wollt wachsen? Schreibt uns direkt — wir antworten innerhalb von 24 Stunden." data-en="You're a brand looking for the right creator? Or you're a creator who wants to grow? Write to us directly — we respond within 24 hours.">
+        Ihr seid eine Brand und sucht den richtigen Creator? Oder ihr seid ein Creator und wollt wachsen? Schreibt uns direkt — wir antworten innerhalb von 24 Stunden.
+      </p>
+      <div class="contact-item">
+        <div class="contact-item-icon">✉</div>
+        <div>
+          <div class="contact-item-label" data-de="E-Mail" data-en="Email">E-Mail</div>
+          <div class="contact-item-val"><a href="mailto:management@twolanes.de">management@[eure-domain].de</a></div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon" style="font-size:13px;">IG</div>
+        <div>
+          <div class="contact-item-label">Instagram</div>
+          <div class="contact-item-val"><a href="#">@[twolanes_handle]</a></div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon" style="font-size:13px;">📍</div>
+        <div>
+          <div class="contact-item-label" data-de="Standort" data-en="Location">Standort</div>
+          <div class="contact-item-val">Deutschland</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-right reveal reveal-d3">
+      <div class="contact-right-slashes">
+        <div class="contact-right-slash"></div>
+        <div class="contact-right-slash"></div>
+      </div>
+      <h3 data-de="Bereit zu wachsen?" data-en="Ready to grow?">Bereit zu wachsen?</h3>
+      <p data-de="Schreibt uns eine kurze E-Mail — ob Brand oder Creator. Wir schauen uns jede Anfrage persönlich an." data-en="Send us a short email — whether brand or creator. We review every inquiry personally.">
+        Schreibt uns eine kurze E-Mail — ob Brand oder Creator. Wir schauen uns jede Anfrage persönlich an.
+      </p>
+      <a href="mailto:management@twolanes.de" class="btn-white" data-de="// E-Mail schreiben" data-en="// Send Email">// E-Mail schreiben</a>
+      <div class="contact-note" data-de="Antwort innerhalb von 24 Stunden" data-en="Response within 24 hours">Antwort innerhalb von 24 Stunden</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">
+    <div class="footer-slash"></div>
+    <div class="footer-slash" style="margin-left:4px;"></div>
+    <div class="footer-logo-text" style="margin-left:10px;">TwoLanes</div>
+  </a>
+  <div class="footer-copy" data-de="© 2025 TwoLanes Creator Management" data-en="© 2025 TwoLanes Creator Management">© 2025 TwoLanes Creator Management</div>
+  <div class="footer-links">
+    <a href="#" data-de="Impressum" data-en="Imprint">Impressum</a>
+    <a href="#" data-de="Datenschutz" data-en="Privacy">Datenschutz</a>
+  </div>
+</footer>
+
+<script>
+// Cursor
+const cur = document.getElementById('cursor'), ring = document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => {
+  mx=e.clientX; my=e.clientY;
+  cur.style.left=mx-4+'px'; cur.style.top=my-4+'px';
+});
+(function tick(){ rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1; ring.style.left=rx-16+'px'; ring.style.top=ry-16+'px'; requestAnimationFrame(tick); })();
+
+// Nav scroll
+window.addEventListener('scroll', () => document.getElementById('nav').classList.toggle('scrolled', scrollY>60));
+
+// Reveal
+new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('visible')), {threshold:0.1})
+  .observe = (function(orig){ return function(el){ orig.call(this,el); }; })(IntersectionObserver.prototype.observe);
+const obs = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('visible')), {threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Tabs
+function showTab(tab, btn) {
+  document.querySelectorAll('.services-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.services-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Language
+function setLang(lang, btn) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('[data-'+lang+']').forEach(el => { el.innerHTML = el.getAttribute('data-'+lang); });
+  document.documentElement.lang = lang;
+}
+</script>
+</body>
+</html>
